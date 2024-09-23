@@ -1,10 +1,13 @@
 const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
-let targetUrl = 'https://www.vgtk.by/schedule/lessons/day-today.php'
-const mainElement = document.querySelector('.main')
 const date = document.querySelector(".date")
 const selectElement = document.querySelector("select[name='lessons']")
+const lesson = document.querySelector("textarea")
+let SСHEDULE = []
+let targetUrl = 'https://www.vgtk.by/schedule/lessons/day-today.php'
+let isToday = true;
+
 const userSelectedGropus = []
-const SСHEDULE = []
+const userSelectedLessons = []
 
 const allGroups = [
   "А-11","А-21","А-31","А-41",
@@ -36,12 +39,23 @@ const allGroups = [
   "ПЭС-315","ПКМ-12","ПКМ-22","ПМР-19",
   "ПМР-119","ПМР-29",
   ]
-
 allGroups.forEach(group => {selectElement.appendChild(new Option(group, group))})
 
-function removeStyleAttribute(node) {
-  if (node.nodeType === 1) {node.removeAttribute("style")}
-  for (const child of node.childNodes){removeStyleAttribute(child)}
+
+function getGroups(){
+    userSelectedGropus.push(selectElement.value)
+    userSelectedLessons.push(lesson.value)
+    filterschedule()
+}
+
+function filterschedule(){
+    console.log(JSON.stringify(SСHEDULE))
+    /*let filteredSchedule = SСHEDULE.filter(item => userSelectedGropus.includes(item.groupName))
+
+    let fil = filteredSchedule.map((x) => {x.filter(item =>  userSelectedLessons.includes(item.lessonName))})
+
+    console.log(filteredSchedule,test)
+    //console.log(userSelectedGropus,userSelectedLessons)*/
 }
 
 // Функция для разделения td с атрибутом rowspan равным 2
@@ -64,47 +78,54 @@ function splitRowspan2TD(tableElement) {
     }
 }
 
-fetch(proxyUrl + targetUrl)
-  .then(response => response.text())
-  .then(data => {
-    const tempElement = document.createElement('div');
-    tempElement.innerHTML = data;
-    const tableElement = tempElement.querySelector('table');
-    date.innerText = tableElement.rows[0].innerText.trim()
-    
-    mainElement.append(tableElement)
-    splitRowspan2TD(tableElement)
-    removeStyleAttribute(mainElement);
-    
-    for (let i = 0; i < tableElement.rows.length - 11; i++) {
-        const row = tableElement.rows[i];
-        if (row.cells.length > 1) {
-            Array.from(row.cells).forEach((cell, j) => {
-                let cellValue = cell.innerText.trim();
-                if (allGroups.includes(cellValue)) {
-                    const groupSchedule = {
-                        groupName: cellValue,
-                        ...Array.from({ length: 11 }, (_, index) => ({
-                            [index + 1]: {
-                                lessonName: tableElement.rows[i + index + 1].cells[j]?.innerText.trim(),
-                                cabinet: tableElement.rows[i + index + 1].cells[j + 1]?.innerText.trim()
-                            }
-                        }))
-                    }
-                    SСHEDULE.push(groupSchedule);
-                }
-            })
-        }
-    }
+function getVGTK(url){
+    fetch(url)
+    .then(response => response.text())
+    .then(data => {
+        SСHEDULE = []
+        const tempElement = document.createElement('div');
+        tempElement.innerHTML = data;
+        const tableElement = tempElement.querySelector('table');
+        date.innerText = tableElement.rows[0].innerText.trim()
 
+        splitRowspan2TD(tableElement)
+    
+        for (let i = 0; i < tableElement.rows.length - 11; i++) {
+            const row = tableElement.rows[i];
+            if (row.cells.length > 1) {
+                Array.from(row.cells).forEach((cell, j) => {
+                    let cellValue = cell.innerText.trim();
+                    if (allGroups.includes(cellValue)) {
+                        const groupSchedule = {
+                            groupName: cellValue,
+                            ...Array.from({ length: 11 }, (_, index) => ({
+                                [index + 1]: {
+                                    lessonName: tableElement.rows[i + index + 1].cells[j]?.innerText.trim(),
+                                    cabinet: tableElement.rows[i + index + 1].cells[j + 1]?.innerText.trim()
+                                }
+                            }))
+                        }
+                        SСHEDULE.push(groupSchedule);
+                    }
+                })
+            }
+        }
     console.log(SСHEDULE)
   })
   .catch(error => console.error('Ошибка:', error))
+}
+getVGTK(proxyUrl + targetUrl)
 
-const changeDay = () => {
-    targetUrl = "https://www.vgtk.by/schedule/lessons/day-tomorrow.php";
-};
-
+function changeDay() {
+    isToday = !isToday;
+      if (isToday) {
+        targetUrl = "https://www.vgtk.by/schedule/lessons/day-today.php";
+        getVGTK(proxyUrl + targetUrl)
+      } else {  
+        targetUrl = "https://www.vgtk.by/schedule/lessons/day-tomorrow.php";
+        getVGTK(proxyUrl + targetUrl)
+      }
+}
 
 
 
