@@ -41,7 +41,6 @@ const allGroups = [
   ]
 allGroups.forEach(group => {selectElement.appendChild(new Option(group, group))})
 
-
 function getGroups(){
     userSelectedGropus.push(selectElement.value)
     userSelectedLessons.push(lesson.value)
@@ -49,13 +48,11 @@ function getGroups(){
 }
 
 function filterschedule(){
-    console.log(JSON.stringify(SСHEDULE))
-    /*let filteredSchedule = SСHEDULE.filter(item => userSelectedGropus.includes(item.groupName))
+    let filteredSchedule = SСHEDULE.filter(item => userSelectedGropus.includes(item.groupName))
+    let filteredLessons = SСHEDULE.filter(item =>  userSelectedLessons.includes(item.lessonName))
 
-    let fil = filteredSchedule.map((x) => {x.filter(item =>  userSelectedLessons.includes(item.lessonName))})
-
-    console.log(filteredSchedule,test)
-    //console.log(userSelectedGropus,userSelectedLessons)*/
+    console.log(filteredSchedule,filteredLessons)
+    console.log(userSelectedGropus,userSelectedLessons)
 }
 
 // Функция для разделения td с атрибутом rowspan равным 2
