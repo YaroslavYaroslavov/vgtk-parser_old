@@ -1,14 +1,28 @@
-const proxyUrl = "https://cors-anywhere.herokuapp.com/";
+// const proxyUrl = "https://cors-anywhere.herokuapp.com/";
+const proxyUrl = "";
 const date = document.querySelector(".date");
 const selectElement = document.querySelector("select[name='lessons']");
 const lesson = document.querySelector("textarea");
-const classes = document.querySelector(".Classes")
-let SСHEDULE = [];
+const classes = document.querySelector(".scheduleContainer");
+let SCHEDULE = [];
 let targetUrl = "https://www.vgtk.by/schedule/lessons/day-today.php";
 let isToday = true;
 
-const userSelectedGropus = [];
-const userSelectedLessons = [];
+const userTarification = [];
+
+const lessonsTime = {
+  1: "09.00 - 09.45",
+  2: "09.55 - 10.40",
+  3: "10.50 - 11.35",
+  4: "11.45 - 12.30",
+  5: "12.40 - 13.25",
+  6: "13.35 - 14.20",
+  7: "14.30 - 15.15",
+  8: "15.25 - 16.10",
+  9: "16.20 - 17.05",
+  10: "17.15 - 18.00",
+  11: "18.10 - 18.55",
+};
 
 const allGroups = [
   "А-11",
@@ -92,27 +106,63 @@ const allGroups = [
   "ПМР-19",
   "ПМР-119",
   "ПМР-29",
-]
+];
 allGroups.forEach((group) => {
   selectElement.appendChild(new Option(group, group));
 });
 
 function getGroups() {
-  userSelectedGropus.push(selectElement.value);
-  userSelectedLessons.push(lesson.value);
+  userTarification.push({
+    groupName: selectElement.value,
+    lesson: lesson.value,
+  });
+  // userSelectedGropus.push(selectElement.value);
+  // userSelectedLessons.push(lesson.value);
   filterschedule();
 }
 
 function filterschedule() {
-    let filteredSchedule = SСHEDULE.filter((item) => 
-        userSelectedGropus.includes(item.groupName))
+  // console.log(newSchedule);
+  const newSchedule = [];
+  classes.innerHTML = "";
 
-    let filteredLessons = filteredSchedule.flatMap((group) => 
-        group.lessons.filter((lesson) => userSelectedLessons.includes(lesson.lessonName))
-    )
+  userTarification.forEach((item) => {
+    const { groupName, lesson } = item;
+    const scheduleItem = SCHEDULE.find(
+      (schedule) =>
+        schedule.groupName === groupName &&
+        schedule.lessons.some((l) => l.lessonName === lesson)
+    );
+    if (scheduleItem) {
+      newSchedule.push(
+        ...scheduleItem.lessons.filter((l) => l.lessonName === lesson)
+      );
+    }
+  });
 
-    console.log(filteredSchedule,filteredLessons)
-    console.log(userSelectedGropus,userSelectedLessons)
+  const scheduleContainer = document.createElement("div");
+
+  newSchedule.forEach((lesson) => {
+    console.log(lesson);
+    const scheduleItem = document.createElement("div");
+    scheduleItem.classList.add("schedule");
+    scheduleItem.textContent = `${lessonsTime[lesson.lessonNumber]} ${
+      lesson.lessonName
+    } ${lesson.cabinet} ${lesson.groupName}`;
+    scheduleContainer.appendChild(scheduleItem);
+  });
+
+  classes.appendChild(scheduleContainer);
+  // let filteredLessons = filteredSchedule.flatMap((group) =>
+  //   group.lessons.filter((lesson) =>
+  //     userSelectedLessons.includes(lesson.lessonName)
+  //   )
+  // );
+
+  // console.log(SCHEDULE);
+
+  // console.log(filteredSchedule,filteredLessons)
+  // console.log(userSelectedGropus,userSelectedLessons)
 }
 
 function splitRowspan2TD(tableElement) {
@@ -138,16 +188,16 @@ function splitRowspan2TD(tableElement) {
 }
 
 function getVGTK(url) {
-    fetch(url)
+  fetch(url)
     .then((response) => response.text())
     .then((data) => {
-        SСHEDULE = [];
-        const tempElement = document.createElement("div");
-        tempElement.innerHTML = data;
-        const tableElement = tempElement.querySelector("table");
-        date.innerText = tableElement.rows[0].innerText.trim();
+      SCHEDULE = [];
+      const tempElement = document.createElement("div");
+      tempElement.innerHTML = data;
+      const tableElement = tempElement.querySelector("table");
+      date.innerText = tableElement.rows[0].innerText.trim();
 
-        splitRowspan2TD(tableElement);
+      splitRowspan2TD(tableElement);
 
       for (let i = 0; i < tableElement.rows.length - 11; i++) {
         const row = tableElement.rows[i];
@@ -161,22 +211,28 @@ function getVGTK(url) {
                   lessonName:
                     tableElement.rows[i + index + 1].cells[j]?.innerText.trim(),
                   cabinet:
-                    tableElement.rows[i + index + 1].cells[j + 1]?.innerText.trim(),
+                    tableElement.rows[i + index + 1].cells[
+                      j + 1
+                    ]?.innerText.trim(),
+                  lessonNumber: index + 1,
+                  groupName: cellValue,
                 })),
-              }
-              SСHEDULE.push(groupSchedule);
+              };
+              SCHEDULE.push(groupSchedule);
             }
-          })
+          });
         }
       }
-      console.log(SСHEDULE);
+      console.log(SCHEDULE);
     })
     .catch((error) => console.error("Ошибка:", error));
 }
 getVGTK(proxyUrl + targetUrl);
 
 function changeDay() {
-  isToday = !isToday
-  targetUrl = isToday ? "https://www.vgtk.by/schedule/lessons/day-today.php" : "https://www.vgtk.by/schedule/lessons/day-tomorrow.php";
-  getVGTK(proxyUrl + targetUrl)
+  isToday = !isToday;
+  targetUrl = isToday
+    ? "https://www.vgtk.by/schedule/lessons/day-today.php"
+    : "https://www.vgtk.by/schedule/lessons/day-tomorrow.php";
+  getVGTK(proxyUrl + targetUrl);
 }

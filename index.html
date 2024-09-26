@@ -1,29 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Document</title>
-	<link href="style.css" rel="stylesheet">
-</head>
-<body class="main">
-	<header>
-  		<a href="#" onclick="changeDay()" class="date"></a>
-	</header>
-	<main>
-		<textarea rows='1' cols='10' class="action"></textarea>
-		<select name="lessons" class="action"></select>
-		<button onclick="getGroups()" class="button action">Добавить</button>
-	</main>	
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link href="style.css" rel="stylesheet" />
+  </head>
+  <body class="main">
+    <header>
+      <a href="#" onclick="changeDay()" class="date"></a>
+    </header>
+    <main>
+      <textarea rows="1" cols="10" class="action"></textarea>
+      <select name="lessons" class="action"></select>
+      <button onclick="getGroups()" class="button action">Добавить</button>
+    </main>
 
-	<footer>
-		<div class="Classes">
-			<p>Ваши занятия:</p>
-			<div class="schedule">09.00 - 09.45 Физика 42к A-11</div>
-			<div class="schedule">09.00 - 09.45 Физика 42к A-11</div>
-		</div>
-	</footer>
-	
- 	<script src="script.js"> 	</script>
-</body>
+    <footer>
+      <div class="Classes">
+        <p>Ваши занятия:</p>
+        <div class="scheduleContainer"></div>
+      </div>
+    </footer>
+
+    <script src="script.js"></script>
+  </body>
 </html>
