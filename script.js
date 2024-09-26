@@ -1,8 +1,8 @@
-// const proxyUrl = "https://cors-anywhere.herokuapp.com/";
-const proxyUrl = "";
+const proxyUrl = "https://cors-anywhere.herokuapp.com/";
 const date = document.querySelector(".date");
 const selectElement = document.querySelector("select[name='lessons']");
 const lesson = document.querySelector("textarea");
+const classes = document.querySelector(".Classes")
 let SСHEDULE = [];
 let targetUrl = "https://www.vgtk.by/schedule/lessons/day-today.php";
 let isToday = true;
@@ -92,7 +92,7 @@ const allGroups = [
   "ПМР-19",
   "ПМР-119",
   "ПМР-29",
-];
+]
 allGroups.forEach((group) => {
   selectElement.appendChild(new Option(group, group));
 });
@@ -104,20 +104,17 @@ function getGroups() {
 }
 
 function filterschedule() {
-  let filteredSchedule = SСHEDULE.filter((item) =>
-    userSelectedGropus.includes(item.groupName)
-  );
-  let filteredLessons = [];
+    let filteredSchedule = SСHEDULE.filter((item) => 
+        userSelectedGropus.includes(item.groupName))
 
-  // console.log(userSelectedLessons);
+    let filteredLessons = filteredSchedule.flatMap((group) => 
+        group.lessons.filter((lesson) => userSelectedLessons.includes(lesson.lessonName))
+    )
 
-  //   console.log(SСHEDULE);
-
-  console.log(filteredLessons);
-  // console.log(userSelectedGropus,userSelectedLessons)
+    console.log(filteredSchedule,filteredLessons)
+    console.log(userSelectedGropus,userSelectedLessons)
 }
 
-// Функция для разделения td с атрибутом rowspan равным 2
 function splitRowspan2TD(tableElement) {
   for (let i = 0; i < tableElement.rows.length; i++) {
     let row = tableElement.rows[i];
@@ -141,16 +138,16 @@ function splitRowspan2TD(tableElement) {
 }
 
 function getVGTK(url) {
-  fetch(url)
+    fetch(url)
     .then((response) => response.text())
     .then((data) => {
-      SСHEDULE = [];
-      const tempElement = document.createElement("div");
-      tempElement.innerHTML = data;
-      const tableElement = tempElement.querySelector("table");
-      date.innerText = tableElement.rows[0].innerText.trim();
+        SСHEDULE = [];
+        const tempElement = document.createElement("div");
+        tempElement.innerHTML = data;
+        const tableElement = tempElement.querySelector("table");
+        date.innerText = tableElement.rows[0].innerText.trim();
 
-      splitRowspan2TD(tableElement);
+        splitRowspan2TD(tableElement);
 
       for (let i = 0; i < tableElement.rows.length - 11; i++) {
         const row = tableElement.rows[i];
@@ -164,14 +161,12 @@ function getVGTK(url) {
                   lessonName:
                     tableElement.rows[i + index + 1].cells[j]?.innerText.trim(),
                   cabinet:
-                    tableElement.rows[i + index + 1].cells[
-                      j + 1
-                    ]?.innerText.trim(),
+                    tableElement.rows[i + index + 1].cells[j + 1]?.innerText.trim(),
                 })),
-              };
+              }
               SСHEDULE.push(groupSchedule);
             }
-          });
+          })
         }
       }
       console.log(SСHEDULE);
@@ -181,12 +176,7 @@ function getVGTK(url) {
 getVGTK(proxyUrl + targetUrl);
 
 function changeDay() {
-  isToday = !isToday;
-  if (isToday) {
-    targetUrl = "https://www.vgtk.by/schedule/lessons/day-today.php";
-    getVGTK(proxyUrl + targetUrl);
-  } else {
-    targetUrl = "https://www.vgtk.by/schedule/lessons/day-tomorrow.php";
-    getVGTK(proxyUrl + targetUrl);
-  }
+  isToday = !isToday
+  targetUrl = isToday ? "https://www.vgtk.by/schedule/lessons/day-today.php" : "https://www.vgtk.by/schedule/lessons/day-tomorrow.php";
+  getVGTK(proxyUrl + targetUrl)
 }
