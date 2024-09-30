@@ -8,7 +8,50 @@ let SCHEDULE = [];
 let targetUrl = "https://www.vgtk.by/schedule/lessons/day-today.php";
 let isToday = true;
 
-const userTarification = [];
+const userTarification = [
+  {
+    groupName: "ВР-21",
+    lesson: "Основы инф.безопасности",
+    lecture: true,
+    labs: true,
+  },
+  {
+    groupName: "ПЭС-25",
+    lesson: "Математика",
+    lecture: true,
+    labs: false,
+  },
+  {
+    groupName: "М-11",
+    lesson: "Математика",
+    lecture: true,
+    labs: false,
+  },
+  {
+    groupName: "ВС-31",
+    lesson: "ТР ПО",
+    lecture: false,
+    labs: true,
+  },
+  {
+    groupName: "ЭМ-32",
+    lesson: "ПЦУ",
+    lecture: false,
+    labs: true,
+  },
+  {
+    groupName: "ЭМ-42",
+    lesson: "ПЦУ",
+    lecture: false,
+    labs: true,
+  },
+  {
+    groupName: "ВС-41",
+    lesson: "Основы веб-програм.",
+    lecture: false,
+    labs: true,
+  },
+];
 
 const lessonsTime = {
   1: "09.00 - 09.45",
@@ -116,23 +159,26 @@ function getGroups() {
     groupName: selectElement.value,
     lesson: lesson.value,
   });
-  // userSelectedGropus.push(selectElement.value);
-  // userSelectedLessons.push(lesson.value);
   filterschedule();
 }
 
 function filterschedule() {
-  // console.log(newSchedule);
   const newSchedule = [];
   classes.innerHTML = "";
 
   userTarification.forEach((item) => {
-    const { groupName, lesson } = item;
+    const { groupName, lesson, labs, lecture } = item;
+
     const scheduleItem = SCHEDULE.find(
       (schedule) =>
         schedule.groupName === groupName &&
-        schedule.lessons.some((l) => l.lessonName === lesson)
+        schedule.lessons.some(
+          (l) =>
+            l.lessonName === lesson &&
+            ((labs && l.isLab) || (!l.isLab && lecture))
+        )
     );
+
     if (scheduleItem) {
       newSchedule.push(
         ...scheduleItem.lessons.filter((l) => l.lessonName === lesson)
@@ -142,27 +188,22 @@ function filterschedule() {
 
   const scheduleContainer = document.createElement("div");
 
+  newSchedule.sort(
+    (a, b) => parseFloat(a.lessonNumber) - parseFloat(b.lessonNumber)
+  );
+
   newSchedule.forEach((lesson) => {
     console.log(lesson);
     const scheduleItem = document.createElement("div");
     scheduleItem.classList.add("schedule");
-    scheduleItem.textContent = `${lessonsTime[lesson.lessonNumber]} ${
-      lesson.lessonName
-    } ${lesson.cabinet} ${lesson.groupName}`;
+    scheduleItem.textContent = `${lesson.lessonNumber}. ${
+      lessonsTime[lesson.lessonNumber]
+    } ${lesson.lessonName} ${lesson.cabinet} ${lesson.groupName}`;
+
     scheduleContainer.appendChild(scheduleItem);
   });
 
   classes.appendChild(scheduleContainer);
-  // let filteredLessons = filteredSchedule.flatMap((group) =>
-  //   group.lessons.filter((lesson) =>
-  //     userSelectedLessons.includes(lesson.lessonName)
-  //   )
-  // );
-
-  // console.log(SCHEDULE);
-
-  // console.log(filteredSchedule,filteredLessons)
-  // console.log(userSelectedGropus,userSelectedLessons)
 }
 
 function splitRowspan2TD(tableElement) {
@@ -216,6 +257,11 @@ function getVGTK(url) {
                     ]?.innerText.trim(),
                   lessonNumber: index + 1,
                   groupName: cellValue,
+                  isLab: tableElement.rows[i + index + 1].cells[
+                    j + 1
+                  ]?.innerText
+                    .trim()
+                    .includes("/"),
                 })),
               };
               SCHEDULE.push(groupSchedule);
@@ -223,7 +269,7 @@ function getVGTK(url) {
           });
         }
       }
-      console.log(SCHEDULE);
+      filterschedule();
     })
     .catch((error) => console.error("Ошибка:", error));
 }
