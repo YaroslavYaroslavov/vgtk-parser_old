@@ -16,6 +16,36 @@ const userTarification = [
     labs: true,
   },
   {
+    groupName: "ЖБИ-11",
+    lesson: "Информатика",
+    lecture: false,
+    labs: true,
+  },
+  {
+    groupName: "ПКО-11",
+    lesson: "Информатика",
+    lecture: false,
+    labs: true,
+  },
+  {
+    groupName: "ПФЭ-16",
+    lesson: "Информатика",
+    lecture: false,
+    labs: true,
+  },
+  {
+    groupName: "ПСЭ-11",
+    lesson: "Информатика",
+    lecture: false,
+    labs: true,
+  },
+  {
+    groupName: "ПЭС-115",
+    lesson: "Информатика",
+    lecture: false,
+    labs: true,
+  },
+  {
     groupName: "ПЭС-25",
     lesson: "Математика",
     lecture: true,
@@ -51,6 +81,12 @@ const userTarification = [
     lecture: false,
     labs: true,
   },
+  // {
+  //   groupName: "ВС-21",
+  //   lesson: "ИТ",
+  //   lecture: false,
+  //   labs: true,
+  // },
 ];
 
 const lessonsTime = {
@@ -195,10 +231,31 @@ function filterschedule() {
   newSchedule.forEach((lesson) => {
     console.log(lesson);
     const scheduleItem = document.createElement("div");
+    const lessonNumberElement = document.createElement("div");
+    const timeElement = document.createElement("div");
+    const subjectElement = document.createElement("div");
+    const groupElement = document.createElement("div");
+    const cabinetElement = document.createElement("div");
+
+    lessonNumberElement.classList.add("lesson");
+    timeElement.classList.add("time");
+    subjectElement.classList.add("subject");
+    groupElement.classList.add("group");
+    cabinetElement.classList.add("cabinet");
+
+    lessonNumberElement.textContent = lesson.lessonNumber;
+    timeElement.textContent = lessonsTime[lesson.lessonNumber];
+    subjectElement.textContent = lesson.lessonName;
+    groupElement.textContent = lesson.groupName;
+    cabinetElement.textContent = lesson.cabinet;
+
     scheduleItem.classList.add("schedule");
-    scheduleItem.textContent = `${lesson.lessonNumber}. ${
-      lessonsTime[lesson.lessonNumber]
-    } ${lesson.lessonName} ${lesson.cabinet} ${lesson.groupName}`;
+
+    scheduleItem.appendChild(lessonNumberElement);
+    scheduleItem.appendChild(timeElement);
+    scheduleItem.appendChild(subjectElement);
+    scheduleItem.appendChild(groupElement);
+    scheduleItem.appendChild(cabinetElement);
 
     scheduleContainer.appendChild(scheduleItem);
   });
