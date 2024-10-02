@@ -75,12 +75,12 @@ const userTarification = [
     lecture: false,
     labs: true,
   },
-  {
-    groupName: "ВС-41",
-    lesson: "Основы веб-програм.",
-    lecture: false,
-    labs: true,
-  },
+  // {
+  //   groupName: "ВС-41",
+  //   lesson: "Основы веб-програм.",
+  //   lecture: false,
+  //   labs: true,
+  // },
   // {
   //   groupName: "ВС-21",
   //   lesson: "ИТ",
@@ -228,8 +228,32 @@ function filterschedule() {
     (a, b) => parseFloat(a.lessonNumber) - parseFloat(b.lessonNumber)
   );
 
+  let prevLessonNumber = 0;
+
   newSchedule.forEach((lesson) => {
-    console.log(lesson);
+    console.log(lesson.lessonNumber);
+
+    if (lesson.lessonNumber !== prevLessonNumber + 1) {
+      const scheduleItem = document.createElement("div");
+      const subjectElement = document.createElement("div");
+      const lessonNumberElement = document.createElement("div");
+      const timeElement = document.createElement("div");
+
+      scheduleItem.classList.add("schedule");
+      lessonNumberElement.classList.add("lesson");
+      timeElement.classList.add("time");
+      subjectElement.classList.add("subject");
+
+      lessonNumberElement.textContent = prevLessonNumber + 1;
+      timeElement.textContent = lessonsTime[prevLessonNumber + 1];
+      subjectElement.textContent = "ОБЕД";
+
+      scheduleItem.appendChild(lessonNumberElement);
+      scheduleItem.appendChild(timeElement);
+      scheduleItem.appendChild(subjectElement);
+      scheduleContainer.appendChild(scheduleItem);
+    }
+
     const scheduleItem = document.createElement("div");
     const lessonNumberElement = document.createElement("div");
     const timeElement = document.createElement("div");
@@ -242,14 +266,13 @@ function filterschedule() {
     subjectElement.classList.add("subject");
     groupElement.classList.add("group");
     cabinetElement.classList.add("cabinet");
+    scheduleItem.classList.add("schedule");
 
     lessonNumberElement.textContent = lesson.lessonNumber;
     timeElement.textContent = lessonsTime[lesson.lessonNumber];
     subjectElement.textContent = lesson.lessonName;
     groupElement.textContent = lesson.groupName;
     cabinetElement.textContent = lesson.cabinet;
-
-    scheduleItem.classList.add("schedule");
 
     scheduleItem.appendChild(lessonNumberElement);
     scheduleItem.appendChild(timeElement);
@@ -258,6 +281,8 @@ function filterschedule() {
     scheduleItem.appendChild(cabinetElement);
 
     scheduleContainer.appendChild(scheduleItem);
+
+    prevLessonNumber = lesson.lessonNumber;
   });
 
   classes.appendChild(scheduleContainer);
