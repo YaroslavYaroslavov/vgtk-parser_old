@@ -4,90 +4,97 @@ const date = document.querySelector(".date");
 const selectElement = document.querySelector("select[name='lessons']");
 const lesson = document.querySelector("textarea");
 const classes = document.querySelector(".scheduleContainer");
+const labs_check = document.querySelector(".labs_check");
+const lecture_check = document.querySelector(".lectures_check");
+
 let SCHEDULE = [];
 let targetUrl = "https://www.vgtk.by/schedule/lessons/day-today.php";
 let isToday = true;
 
-const userTarification = [
-  {
-    groupName: "ВР-21",
-    lesson: "Основы инф.безопасности",
-    lecture: true,
-    labs: true,
-  },
-  {
-    groupName: "ЖБИ-11",
-    lesson: "Информатика",
-    lecture: false,
-    labs: true,
-  },
-  {
-    groupName: "ПКО-11",
-    lesson: "Информатика",
-    lecture: false,
-    labs: true,
-  },
-  {
-    groupName: "ПФЭ-16",
-    lesson: "Информатика",
-    lecture: false,
-    labs: true,
-  },
-  {
-    groupName: "ПСЭ-11",
-    lesson: "Информатика",
-    lecture: false,
-    labs: true,
-  },
-  {
-    groupName: "ПЭС-115",
-    lesson: "Информатика",
-    lecture: false,
-    labs: true,
-  },
-  {
-    groupName: "ПЭС-25",
-    lesson: "Математика",
-    lecture: true,
-    labs: false,
-  },
-  {
-    groupName: "М-11",
-    lesson: "Математика",
-    lecture: true,
-    labs: false,
-  },
-  {
-    groupName: "ВС-31",
-    lesson: "ТР ПО",
-    lecture: false,
-    labs: true,
-  },
-  {
-    groupName: "ЭМ-32",
-    lesson: "ПЦУ",
-    lecture: false,
-    labs: true,
-  },
-  {
-    groupName: "ЭМ-42",
-    lesson: "ПЦУ",
-    lecture: false,
-    labs: true,
-  },
-  // {
-  //   groupName: "ВС-41",
-  //   lesson: "Основы веб-програм.",
-  //   lecture: false,
-  //   labs: true,
-  // },
-  // {
-  //   groupName: "ВС-21",
-  //   lesson: "ИТ",
-  //   lecture: false,
-  //   labs: true,
-  // },
-];
+const userTarification =
+  JSON.parse(localStorage.getItem("userTarification")) || [];
+
+console.log(userTarification);
+// const userTarification = [
+//   {
+//     groupName: "ВР-21",
+//     lesson: "Основы инф.безопасности",
+//     lecture: true,
+//     labs: true,
+//   },
+//   {
+//     groupName: "ЖБИ-11",
+//     lesson: "Информатика",
+//     lecture: false,
+//     labs: true,
+//   },
+//   {
+//     groupName: "ПКО-11",
+//     lesson: "Информатика",
+//     lecture: false,
+//     labs: true,
+//   },
+//   {
+//     groupName: "ПФЭ-16",
+//     lesson: "Информатика",
+//     lecture: false,
+//     labs: true,
+//   },
+//   {
+//     groupName: "ПСЭ-11",
+//     lesson: "Информатика",
+//     lecture: false,
+//     labs: true,
+//   },
+//   {
+//     groupName: "ПЭС-115",
+//     lesson: "Информатика",
+//     lecture: false,
+//     labs: true,
+//   },
+//   {
+//     // groupName: "ПЭС-25",
+//     lesson: "Математика",
+//     lecture: true,
+//     labs: false,
+//   },
+//   {
+//     groupName: "М-11",
+//     lesson: "Математика",
+//     lecture: true,
+//     labs: false,
+//   },
+//   {
+//     groupName: "ВС-31",
+//     lesson: "ТР ПО",
+//     lecture: false,
+//     labs: true,
+//   },
+//   {
+//     groupName: "ЭМ-32",
+//     lesson: "ПЦУ",
+//     lecture: false,
+//     labs: true,
+//   },
+//   {
+//     groupName: "ЭМ-42",
+//     lesson: "ПЦУ",
+//     lecture: false,
+//     labs: true,
+//   },
+//   {
+//     groupName: "ВР-21",
+//     lesson: "Осн.инф.безопас.",
+//     lecture: true,
+//     labs: true,
+//   },
+//   {
+//     groupName: "ВС-31",
+//     lesson: "ПУ ПЭВМ",
+//     lecture: false,
+//     labs: true,
+//   },
+// ];
 
 const lessonsTime = {
   1: "09.00 - 09.45",
@@ -194,7 +201,11 @@ function getGroups() {
   userTarification.push({
     groupName: selectElement.value,
     lesson: lesson.value,
+    lecture: lecture_check.checked ? true : false,
+    labs: labs_check.checked ? true : false,
   });
+
+  localStorage.setItem("userTarification", JSON.stringify(userTarification));
   filterschedule();
 }
 

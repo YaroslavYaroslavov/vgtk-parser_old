@@ -21,6 +21,7 @@ main {
   padding: 20px 0;
   display: flex;
   justify-content: center;
+  align-items: center;
 }
 
 footer {
@@ -79,4 +80,9 @@ textarea {
 }
 .group {
   width: 100px;
+}
+
+.check {
+  width: 20px;
+  height: 20px;
 }
