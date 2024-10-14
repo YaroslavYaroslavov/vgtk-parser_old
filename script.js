@@ -1,5 +1,5 @@
-const proxyUrl = "https://cors-anywhere.herokuapp.com/";
-// const proxyUrl = "";
+// const proxyUrl = "https://cors-anywhere.herokuapp.com/";
+const proxyUrl = "";
 const date = document.querySelector(".date");
 const selectElement = document.querySelector("select[name='lessons']");
 const lesson = document.querySelector("textarea");
