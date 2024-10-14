@@ -13,8 +13,7 @@ const inputCabinet = document.querySelector(".myCabinetInput");
 
 // const switchState = false;
 
-const myCabinetLectures = [];
-
+let myCabinetLectures = [];
 let myCabinet = localStorage.getItem("myCabinet") || "";
 let scheduleMode = false;
 let SCHEDULE = [];
@@ -33,8 +32,11 @@ switchButton.addEventListener("click", () => {
 });
 
 saveCabinetBtn.addEventListener("click", () => {
+  myCabinetLectures = [];
+
   localStorage.setItem("myCabinet", inputCabinet.value);
   myCabinet = inputCabinet.value;
+  filterschedule();
   getVGTK(proxyUrl + targetUrl);
 });
 
@@ -225,6 +227,7 @@ const filterschedule = () => {
     : "Кабинет не установлен";
 
   const newSchedule = [];
+
   classes.innerHTML = "";
   // console.log(SCHEDULE);
   userTarification.forEach((item) => {
@@ -274,7 +277,6 @@ function splitRowspan2TD(tableElement) {
 
 function getVGTK(url) {
   SCHEDULE = [];
-
   fetch(url)
     .then((response) => response.text())
     .then((data) => {
@@ -330,6 +332,7 @@ function getVGTK(url) {
 getVGTK(proxyUrl + targetUrl);
 
 function changeDay() {
+  myCabinetLectures = [];
   isToday = !isToday;
   targetUrl = isToday
     ? "https://www.vgtk.by/schedule/lessons/day-today.php"
