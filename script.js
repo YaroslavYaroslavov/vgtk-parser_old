@@ -1,100 +1,44 @@
-// const proxyUrl = "https://cors-anywhere.herokuapp.com/";
-const proxyUrl = "";
+const proxyUrl = "https://cors-anywhere.herokuapp.com/";
+// const proxyUrl = "";
 const date = document.querySelector(".date");
 const selectElement = document.querySelector("select[name='lessons']");
 const lesson = document.querySelector("textarea");
 const classes = document.querySelector(".scheduleContainer");
 const labs_check = document.querySelector(".labs_check");
 const lecture_check = document.querySelector(".lectures_check");
+const switchButton = document.querySelector(".switch-btn");
+const switchText = document.querySelector(".toggleTip");
+const saveCabinetBtn = document.querySelector(".saveCabinet");
+const inputCabinet = document.querySelector(".myCabinetInput");
 
+// const switchState = false;
+
+const myCabinetLectures = [];
+
+let myCabinet = localStorage.getItem("myCabinet") || "";
+let scheduleMode = false;
 let SCHEDULE = [];
 let targetUrl = "https://www.vgtk.by/schedule/lessons/day-today.php";
 let isToday = true;
 
 const userTarification =
   JSON.parse(localStorage.getItem("userTarification")) || [];
+const isUserTooltipsOn = localStorage.getItem("isUserTooltipsOn") || true;
 
-console.log(userTarification);
-// const userTarification = [
-//   {
-//     groupName: "ВР-21",
-//     lesson: "Основы инф.безопасности",
-//     lecture: true,
-//     labs: true,
-//   },
-//   {
-//     groupName: "ЖБИ-11",
-//     lesson: "Информатика",
-//     lecture: false,
-//     labs: true,
-//   },
-//   {
-//     groupName: "ПКО-11",
-//     lesson: "Информатика",
-//     lecture: false,
-//     labs: true,
-//   },
-//   {
-//     groupName: "ПФЭ-16",
-//     lesson: "Информатика",
-//     lecture: false,
-//     labs: true,
-//   },
-//   {
-//     groupName: "ПСЭ-11",
-//     lesson: "Информатика",
-//     lecture: false,
-//     labs: true,
-//   },
-//   {
-//     groupName: "ПЭС-115",
-//     lesson: "Информатика",
-//     lecture: false,
-//     labs: true,
-//   },
-//   {
-//     // groupName: "ПЭС-25",
-//     lesson: "Математика",
-//     lecture: true,
-//     labs: false,
-//   },
-//   {
-//     groupName: "М-11",
-//     lesson: "Математика",
-//     lecture: true,
-//     labs: false,
-//   },
-//   {
-//     groupName: "ВС-31",
-//     lesson: "ТР ПО",
-//     lecture: false,
-//     labs: true,
-//   },
-//   {
-//     groupName: "ЭМ-32",
-//     lesson: "ПЦУ",
-//     lecture: false,
-//     labs: true,
-//   },
-//   {
-//     groupName: "ЭМ-42",
-//     lesson: "ПЦУ",
-//     lecture: false,
-//     labs: true,
-//   },
-//   {
-//     groupName: "ВР-21",
-//     lesson: "Осн.инф.безопас.",
-//     lecture: true,
-//     labs: true,
-//   },
-//   {
-//     groupName: "ВС-31",
-//     lesson: "ПУ ПЭВМ",
-//     lecture: false,
-//     labs: true,
-//   },
-// ];
+switchButton.addEventListener("click", () => {
+  switchButton.classList.toggle("switch-on");
+
+  scheduleMode = !scheduleMode;
+  filterschedule();
+});
+
+saveCabinetBtn.addEventListener("click", () => {
+  localStorage.setItem("myCabinet", inputCabinet.value);
+  myCabinet = inputCabinet.value;
+  getVGTK(proxyUrl + targetUrl);
+});
+
+const showTooltips = () => {};
 
 const lessonsTime = {
   1: "09.00 - 09.45",
@@ -197,7 +141,7 @@ allGroups.forEach((group) => {
   selectElement.appendChild(new Option(group, group));
 });
 
-function getGroups() {
+const getGroups = () => {
   userTarification.push({
     groupName: selectElement.value,
     lesson: lesson.value,
@@ -207,44 +151,18 @@ function getGroups() {
 
   localStorage.setItem("userTarification", JSON.stringify(userTarification));
   filterschedule();
-}
+};
 
-function filterschedule() {
-  const newSchedule = [];
-  classes.innerHTML = "";
-
-  userTarification.forEach((item) => {
-    const { groupName, lesson, labs, lecture } = item;
-
-    const scheduleItem = SCHEDULE.find(
-      (schedule) =>
-        schedule.groupName === groupName &&
-        schedule.lessons.some(
-          (l) =>
-            l.lessonName === lesson &&
-            ((labs && l.isLab) || (!l.isLab && lecture))
-        )
-    );
-
-    if (scheduleItem) {
-      newSchedule.push(
-        ...scheduleItem.lessons.filter((l) => l.lessonName === lesson)
-      );
-    }
-  });
-
-  const scheduleContainer = document.createElement("div");
-
-  newSchedule.sort(
+const drawSchedule = (newSchedule) => {
+  // console.log(newSchedule);
+  const renderSchedule = newSchedule.sort(
     (a, b) => parseFloat(a.lessonNumber) - parseFloat(b.lessonNumber)
   );
-
   let prevLessonNumber = 0;
+  const scheduleContainer = document.createElement("div");
 
-  newSchedule.forEach((lesson) => {
-    console.log(lesson.lessonNumber);
-
-    if (lesson.lessonNumber !== prevLessonNumber + 1) {
+  renderSchedule.forEach((lesson) => {
+    if (lesson.lessonNumber !== prevLessonNumber + 1 && scheduleMode) {
       const scheduleItem = document.createElement("div");
       const subjectElement = document.createElement("div");
       const lessonNumberElement = document.createElement("div");
@@ -297,7 +215,40 @@ function filterschedule() {
   });
 
   classes.appendChild(scheduleContainer);
-}
+};
+
+const filterschedule = () => {
+  switchText.innerHTML = scheduleMode
+    ? "Ваше расписание"
+    : myCabinet
+    ? "Расписание в Вашем кабинете " + myCabinet
+    : "Кабинет не установлен";
+
+  const newSchedule = [];
+  classes.innerHTML = "";
+  // console.log(SCHEDULE);
+  userTarification.forEach((item) => {
+    const { groupName, lesson, labs, lecture } = item;
+
+    const scheduleItem = SCHEDULE.find(
+      (schedule) =>
+        schedule.groupName === groupName &&
+        schedule.lessons.some(
+          (l) =>
+            l.lessonName === lesson &&
+            ((labs && l.isLab) || (!l.isLab && lecture))
+        )
+    );
+
+    if (scheduleItem) {
+      newSchedule.push(
+        ...scheduleItem.lessons.filter((l) => l.lessonName === lesson)
+      );
+    }
+  });
+
+  scheduleMode ? drawSchedule(newSchedule) : drawSchedule(myCabinetLectures);
+};
 
 function splitRowspan2TD(tableElement) {
   for (let i = 0; i < tableElement.rows.length; i++) {
@@ -322,10 +273,11 @@ function splitRowspan2TD(tableElement) {
 }
 
 function getVGTK(url) {
+  SCHEDULE = [];
+
   fetch(url)
     .then((response) => response.text())
     .then((data) => {
-      SCHEDULE = [];
       const tempElement = document.createElement("div");
       tempElement.innerHTML = data;
       const tableElement = tempElement.querySelector("table");
@@ -358,11 +310,20 @@ function getVGTK(url) {
                 })),
               };
               SCHEDULE.push(groupSchedule);
+              // console.log(groupSchedule);
+              groupSchedule.lessons.forEach((lesson) => {
+                if (lesson.cabinet?.split("/").includes(myCabinet)) {
+                  // console.log(lesson.cabinet.split("/"));/
+                  myCabinetLectures.push(lesson);
+                  // console.log(myCabinetLectures);
+                }
+              });
             }
           });
         }
       }
       filterschedule();
+      console.log(myCabinetLectures);
     })
     .catch((error) => console.error("Ошибка:", error));
 }

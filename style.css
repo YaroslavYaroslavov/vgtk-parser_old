@@ -22,6 +22,7 @@ main {
   display: flex;
   justify-content: center;
   align-items: center;
+  gap: 55px;
 }
 
 footer {
@@ -85,4 +86,101 @@ textarea {
 .check {
   width: 20px;
   height: 20px;
+}
+
+.tooltip {
+}
+
+.switch-btn {
+  display: inline-block;
+  width: 52px; /* ширина */
+  height: 28px; /* высота */
+  border-radius: 19px; /* радиус скругления */
+  background: #bfbfbf; /* цвет фона */
+  z-index: 0;
+  margin: 0;
+  padding: 0;
+  border: none;
+  cursor: pointer;
+  position: relative;
+  transition-duration: 300ms; /* анимация */
+}
+.switch-btn::after {
+  content: "";
+  height: 22px; /* высота кнопки */
+  width: 22px; /* ширина кнопки */
+  border-radius: 17px;
+  background: #fff; /* цвет кнопки */
+  top: 3px; /* положение кнопки по вертикали относительно основы */
+  left: 3px; /* положение кнопки по горизонтали относительно основы */
+  transition-duration: 300ms; /* анимация */
+  position: absolute;
+  z-index: 1;
+}
+.switch-on {
+  background: #118c4e;
+}
+.switch-on::after {
+  left: 50%;
+}
+
+.switchScheduleModeContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 20px;
+}
+
+.switchScheduleMode {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  /* justify-content: ; */
+  /* align-items: ; */
+  /* justify-content: space-between; */
+}
+
+.myCabinetInput {
+  padding: 10px;
+  margin-right: 10px;
+  border: none;
+  background: rgba(56, 50, 50, 1);
+  color: white;
+  margin: 0;
+  padding: 0;
+  height: 20px;
+}
+
+.inputWrapper {
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: solid;
+  border-color: rgba(41, 37, 37, 1);
+  border-radius: 5px;
+  background: rgba(56, 50, 50, 1);
+  outline-width: 0;
+  /* margin */
+  padding-right: 10px;
+  padding-left: 10px;
+}
+.myCabinetInput:focus {
+  outline-width: 0;
+}
+.saveCabinet {
+  /* margin: 0; */
+  /* padding: 0; */
+
+  background: rgba(56, 50, 50, 1);
+  /* border-left: 0; */
+  width: 20px;
+  height: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.saveCabinet:hover {
+  background: white;
+  color: black;
 }
